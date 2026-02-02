@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Mini App</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <!-- Debug log (visible during development) -->
+    <div id="debug-log" style="position: fixed; bottom: 0; left: 0; right: 0; max-height: 150px; overflow-y: auto; background: #1e1f22; color: #57f287; font-family: monospace; font-size: 11px; padding: 8px; z-index: 9999; border-top: 1px solid #3f4147;"></div>
+
+    <div id="app">
+      <!-- Loading State -->
+      <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Connecting to Discord...</p>
+      </div>
+
+      <!-- Main Content (hidden until SDK is ready) -->
+      <div id="content" class="content hidden">
+        <header class="header">
+          <div id="guild-avatar" class="guild-avatar"></div>
+          <div class="header-info">
+            <h1 id="app-title">Discord Mini App</h1>
+            <p id="channel-name" class="channel-name">Loading...</p>
+          </div>
+        </header>
+
+        <main class="main">
+          <div class="welcome-card">
+            <h2>Welcome to your Mini App!</h2>
+            <p>You're connected to Discord. Start building something amazing!</p>
+
+            <div id="user-info" class="user-info">
+              <img id="user-avatar" class="user-avatar" alt="User avatar" />
+              <span id="user-name">Loading...</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btn-voice-info" class="btn btn-primary">
+              Get Voice Channel Info
+            </button>
+            <button id="btn-participants" class="btn btn-secondary">
+              List Participants
+            </button>
+          </div>
+
+          <div id="output" class="output hidden">
+            <h3>Output</h3>
+            <pre id="output-content"></pre>
+          </div>
+        </main>
+
+        <footer class="footer">
+          <p>Built with Discord Mini App Framework</p>
+        </footer>
+      </div>
+
+      <!-- Error State -->
+      <div id="error" class="error-container hidden">
+        <h2>Connection Error</h2>
+        <p id="error-message">Failed to connect to Discord.</p>
+        <button onclick="location.reload()" class="btn btn-primary">
+          Try Again
+        </button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

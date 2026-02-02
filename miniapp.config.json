@@ -1,0 +1,11 @@
+{
+  "appName": "Discord Mini App Framework",
+  "version": "1.0.0",
+  "template": "basic",
+  "features": ["voice", "avatar", "guild"],
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "framework": {
+    "description": "Agentic framework for creating Discord Mini Apps",
+    "documentation": "https://discord.com/developers/docs/activities/overview"
+  }
+}

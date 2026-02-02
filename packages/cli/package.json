@@ -1,0 +1,27 @@
+{
+  "name": "@discord-miniapp/cli",
+  "version": "1.0.0",
+  "description": "CLI tool for Discord Mini App Framework",
+  "type": "module",
+  "bin": {
+    "discord-miniapp": "./bin/wizard.js",
+    "dm-create": "./bin/create.js",
+    "dm-setup": "./bin/setup.js",
+    "dm-check": "./bin/check-env.js"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.23",
+    "ora": "^8.0.1",
+    "open": "^10.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
