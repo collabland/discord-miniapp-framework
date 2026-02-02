@@ -8,6 +8,24 @@
 import { DiscordSDK, type Types } from '@discord/embedded-app-sdk';
 
 // ============================================================================
+// Debug Logging
+// ============================================================================
+
+function debugLog(message: string, data?: unknown): void {
+  console.log(`[MiniApp] ${message}`, data ?? '');
+
+  // Also show on screen for debugging in Discord
+  const debugEl = document.getElementById('debug-log');
+  if (debugEl) {
+    const time = new Date().toLocaleTimeString();
+    debugEl.innerHTML += `<div>[${time}] ${message}</div>`;
+    if (data) {
+      debugEl.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    }
+  }
+}
+
+// ============================================================================
 // Type Definitions
 // ============================================================================
 
@@ -33,8 +51,34 @@ interface DiscordGuild {
 // Discord SDK Setup
 // ============================================================================
 
+// Check for Client ID
+const clientId = import.meta.env.VITE_CLIENT_ID;
+debugLog('Client ID:', clientId ? `${clientId.substring(0, 8)}...` : 'MISSING!');
+
+if (!clientId) {
+  document.body.innerHTML = `
+    <div style="padding: 20px; color: #ed4245; font-family: sans-serif;">
+      <h2>Configuration Error</h2>
+      <p>VITE_CLIENT_ID is not set. Please check your .env file.</p>
+    </div>
+  `;
+  throw new Error('VITE_CLIENT_ID is not configured');
+}
+
 // Initialize the Discord SDK with your Client ID
-const discordSdk = new DiscordSDK(import.meta.env.VITE_CLIENT_ID);
+let discordSdk: DiscordSDK;
+try {
+  discordSdk = new DiscordSDK(clientId);
+  debugLog('Discord SDK initialized');
+} catch (error) {
+  document.body.innerHTML = `
+    <div style="padding: 20px; color: #ed4245; font-family: sans-serif;">
+      <h2>SDK Initialization Error</h2>
+      <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
+    </div>
+  `;
+  throw error;
+}
 
 // Store authenticated user info
 let currentUser: DiscordUser | null = null;
@@ -46,12 +90,14 @@ let accessToken: string | null = null;
  */
 async function setupDiscordSdk(): Promise<string> {
   // Step 1: Wait for the SDK to be ready
+  debugLog('Step 1: Waiting for SDK ready...');
   await discordSdk.ready();
-  console.log('Discord SDK is ready!');
+  debugLog('SDK is ready!');
 
   // Step 2: Request authorization from Discord
+  debugLog('Step 2: Requesting authorization...');
   const { code } = await discordSdk.commands.authorize({
-    client_id: import.meta.env.VITE_CLIENT_ID,
+    client_id: clientId,
     response_type: 'code',
     state: '',
     prompt: 'none',
@@ -61,8 +107,10 @@ async function setupDiscordSdk(): Promise<string> {
       'rpc.voice.read',     // Read voice channel info
     ],
   });
+  debugLog('Got authorization code');
 
   // Step 3: Exchange the code for an access token (via our server)
+  debugLog('Step 3: Exchanging code for token...');
   const response = await fetch('/api/token', {
     method: 'POST',
     headers: {
@@ -72,17 +120,21 @@ async function setupDiscordSdk(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to exchange code for token');
+    const errorText = await response.text();
+    debugLog('Token exchange failed:', { status: response.status, error: errorText });
+    throw new Error(`Failed to exchange code for token: ${response.status}`);
   }
 
   const { access_token }: AuthResponse = await response.json();
   accessToken = access_token;
+  debugLog('Got access token');
 
   // Step 4: Authenticate with Discord using the token
+  debugLog('Step 4: Authenticating with Discord...');
   const auth = await discordSdk.commands.authenticate({ access_token });
 
   if (auth) {
-    console.log('Authenticated successfully!');
+    debugLog('Authenticated successfully!', { user: auth.user });
     currentUser = auth.user as DiscordUser;
   }
 
@@ -278,15 +330,20 @@ function setupEventHandlers(): void {
 // ============================================================================
 
 async function main(): Promise<void> {
+  debugLog('Main function started');
+
   try {
     // Initialize Discord SDK and authenticate
+    debugLog('Calling setupDiscordSdk...');
     await setupDiscordSdk();
+    debugLog('setupDiscordSdk completed');
 
     // Hide loading, show content
     hideElement('loading');
     showElement('content');
 
     // Update UI with Discord information
+    debugLog('Updating UI...');
     updateUserInfo();
     await updateChannelInfo();
     await updateGuildInfo();
@@ -294,11 +351,12 @@ async function main(): Promise<void> {
     // Set up interactive elements
     setupEventHandlers();
 
-    console.log('Discord Mini App initialized successfully!');
-    console.log('Guild ID:', discordSdk.guildId);
-    console.log('Channel ID:', discordSdk.channelId);
+    debugLog('Discord Mini App initialized successfully!');
+    debugLog('Guild ID:', discordSdk.guildId);
+    debugLog('Channel ID:', discordSdk.channelId);
 
   } catch (error) {
+    debugLog('ERROR in main:', error instanceof Error ? error.message : String(error));
     console.error('Failed to initialize Discord Mini App:', error);
 
     // Hide loading, show error
