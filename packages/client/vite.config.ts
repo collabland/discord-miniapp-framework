@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 3000,
 
+    // Allow Cloudflare tunnel and other external hosts
+    allowedHosts: ['.trycloudflare.com'],
+
     // Proxy API requests to the backend server
     proxy: {
       '/api': {
