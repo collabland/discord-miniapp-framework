@@ -11,6 +11,15 @@ import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
 
+// Type definitions
+interface TokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+}
+
 // Load environment variables from root .env file
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
@@ -117,7 +126,7 @@ app.post('/api/token', async (req: Request, res: Response) => {
       return;
     }
 
-    const tokenData = await response.json();
+    const tokenData = await response.json() as TokenResponse;
 
     // Return only the access token to the client
     // (refresh_token and other sensitive data stay on server)
