@@ -51,6 +51,48 @@ interface DiscordGuild {
 // Discord SDK Setup
 // ============================================================================
 
+// Check if we're running inside Discord's iframe
+const urlParams = new URLSearchParams(window.location.search);
+const frameId = urlParams.get('frame_id');
+const instanceId = urlParams.get('instance_id');
+const platform = urlParams.get('platform');
+
+debugLog('URL params:', { frameId, instanceId, platform, fullUrl: window.location.href });
+
+// If not in Discord iframe, show helpful message
+if (!frameId) {
+  const tunnelUrl = window.location.origin;
+  document.body.innerHTML = `
+    <div style="padding: 40px; color: #f2f3f5; font-family: 'gg sans', sans-serif; background: #313338; min-height: 100vh;">
+      <h2 style="color: #57f287; margin-bottom: 16px;">✓ Server is running!</h2>
+      <p style="color: #b5bac1; margin-bottom: 24px;">
+        This app must be launched from inside Discord, not directly in a browser.
+      </p>
+
+      <div style="background: #2b2d31; padding: 20px; border-radius: 8px; margin-bottom: 24px;">
+        <h3 style="color: #f2f3f5; margin-bottom: 12px;">Setup Instructions:</h3>
+        <ol style="color: #b5bac1; line-height: 2;">
+          <li>Go to <a href="https://discord.com/developers/applications" target="_blank" style="color: #5865f2;">Discord Developer Portal</a></li>
+          <li>Select your application</li>
+          <li>Go to <strong>Activities</strong> in the sidebar</li>
+          <li>Enable <strong>Activities</strong> if not already enabled</li>
+          <li>Under <strong>URL Mappings</strong>, set Root to: <code style="background: #1e1f22; padding: 4px 8px; border-radius: 4px; color: #57f287;">${tunnelUrl}</code></li>
+          <li>Open Discord desktop app → Join a voice channel</li>
+          <li>Click the <strong>Activities</strong> rocket icon 🚀</li>
+          <li>Find and launch your app</li>
+        </ol>
+      </div>
+
+      <div style="background: #2b2d31; padding: 20px; border-radius: 8px;">
+        <h3 style="color: #f2f3f5; margin-bottom: 12px;">Your Configuration:</h3>
+        <p style="color: #b5bac1;">Tunnel URL: <code style="background: #1e1f22; padding: 4px 8px; border-radius: 4px; color: #57f287;">${tunnelUrl}</code></p>
+        <p style="color: #b5bac1;">Client ID: <code style="background: #1e1f22; padding: 4px 8px; border-radius: 4px; color: #57f287;">${import.meta.env.VITE_CLIENT_ID || 'NOT SET'}</code></p>
+      </div>
+    </div>
+  `;
+  throw new Error('Not running inside Discord - this is expected in browser');
+}
+
 // Check for Client ID
 const clientId = import.meta.env.VITE_CLIENT_ID;
 debugLog('Client ID:', clientId ? `${clientId.substring(0, 8)}...` : 'MISSING!');
