@@ -1,0 +1,54 @@
+{
+  "name": "discord-miniapp-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An agentic framework for easily creating Discord Mini Apps (Activities)",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "create": "node packages/cli/bin/create.js",
+    "setup": "node packages/cli/bin/setup.js",
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:client": "cd packages/client && npm run dev",
+    "dev:server": "cd packages/server && npm run dev",
+    "build": "npm-run-all build:*",
+    "build:client": "cd packages/client && npm run build",
+    "build:server": "cd packages/server && npm run build",
+    "tunnel": "cloudflared tunnel --url http://localhost:3000",
+    "start": "cd packages/server && npm start",
+    "check-env": "node packages/cli/bin/check-env.js",
+    "wizard": "node packages/cli/bin/wizard.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "inquirer": "^9.2.23",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "nodemon": "^3.1.0",
+    "npm-run-all2": "^7.0.0",
+    "rimraf": "^5.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "discord",
+    "mini-app",
+    "activity",
+    "embedded-app-sdk",
+    "framework"
+  ],
+  "license": "MIT",
+  "author": "Discord MiniApp Framework"
+}

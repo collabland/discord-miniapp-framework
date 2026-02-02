@@ -1,0 +1,19 @@
+{
+  "name": "@discord-miniapp/client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Discord Mini App Client",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@discord/embedded-app-sdk": "^1.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}
