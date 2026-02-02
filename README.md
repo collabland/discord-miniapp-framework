@@ -14,6 +14,19 @@ Discord Mini Apps (also called Activities) are embedded applications that run in
 - **Type-Safe** - Full TypeScript support for client and server
 - **Discord SDK Integration** - Pre-configured Discord Embedded App SDK
 
+## Platform Compatibility
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| iOS | ✅ Works | Fully supported |
+| Android | ✅ Works | Fully supported |
+| Web (discord.com) | ✅ Works | Fully supported |
+| Discord Canary (Mac/Windows) | ✅ Works | Recommended for desktop development |
+| Discord Stable (Mac) | ⚠️ Issues | May show white screen - use Canary instead |
+| Discord Stable (Windows) | ✅ Works | Fully supported |
+
+> **Warning**: If you experience a white screen when launching your Activity on **Discord Stable for Mac**, please use [Discord Canary](https://discord.com/api/downloads/distributions/app/installers/latest?channel=canary&platform=osx&arch=universal) instead. This is a known issue with the stable Mac client.
+
 ## Quick Start
 
 ### Option 1: Interactive Wizard (Recommended for Beginners)
@@ -60,7 +73,38 @@ npm run tunnel
 4. Go to **OAuth2** and click **"Reset Secret"** to get your **Client Secret**
 5. Add `http://localhost:3000` to **Redirects**
 6. Go to **Activities** and enable the **Activities** toggle
-7. Copy your tunnel URL (from `npm run tunnel`) to the **Activity URL**
+7. Under **Supported Platforms**, enable: Web, iOS, Android
+8. Under **URL Mappings**, add your tunnel URL (from `npm run tunnel`)
+
+## Testing Your Activity
+
+### On iOS/Android
+1. Open Discord mobile app
+2. Join a voice channel
+3. Tap the **Activities** button (rocket icon 🚀)
+4. Find and launch your app
+
+### On Web (discord.com)
+1. Go to https://discord.com/app in your browser
+2. Join a voice channel
+3. Click the **Activities** button
+4. Find and launch your app
+
+### On Desktop (Recommended: Discord Canary)
+
+If you're developing on Mac, we recommend using Discord Canary for the best experience:
+
+**Install Discord Canary:**
+- **Mac**: [Download Discord Canary](https://discord.com/api/downloads/distributions/app/installers/latest?channel=canary&platform=osx&arch=universal)
+- **Windows**: [Download Discord Canary](https://discord.com/api/downloads/distributions/app/installers/latest?channel=canary&platform=win&arch=x64)
+
+**Launch your Activity:**
+1. Open Discord Canary
+2. Join a voice channel
+3. Click the **Activities** button (rocket icon 🚀)
+4. Find and launch your app
+
+> **Note**: Discord Canary is Discord's testing/developer version with the latest features and bug fixes. It's safe to use alongside the stable version.
 
 ## Project Structure
 
@@ -164,23 +208,50 @@ app.get('/api/my-endpoint', (req, res) => {
 
 ## Troubleshooting
 
+### White screen on Discord Mac (Stable)
+
+This is a known issue with Discord Stable on Mac. **Solutions:**
+
+1. **Use Discord Canary** (recommended): [Download here](https://discord.com/api/downloads/distributions/app/installers/latest?channel=canary&platform=osx&arch=universal)
+
+2. **Use Discord Web**: Go to https://discord.com/app in your browser
+
+3. **Clear Discord cache** (if you want to try fixing Stable):
+   ```bash
+   # Quit Discord first, then run:
+   rm -rf ~/Library/Application\ Support/discord/Cache
+   rm -rf ~/Library/Application\ Support/discord/Code\ Cache
+   rm -rf ~/Library/Application\ Support/discord/GPUCache
+   ```
+
+4. **Test on iOS/Android**: The mobile apps work reliably
+
 ### "Failed to connect to Discord"
 
 1. Make sure your `.env` file has the correct `VITE_CLIENT_ID` and `CLIENT_SECRET`
 2. Verify your Discord Application has Activities enabled
-3. Check that your tunnel URL is set as the Activity URL in Discord Developer Portal
+3. Check that your tunnel URL is set in **URL Mappings** in Discord Developer Portal
 
 ### "Tunnel not working"
 
 1. Install Cloudflared: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
 2. Make sure port 3000 is available
 3. Try restarting the tunnel
+4. Note: Tunnel URLs change each time you restart - update your URL Mapping in Discord Developer Portal
 
 ### "npm run dev fails"
 
 1. Run `npm run check-env` to validate your configuration
 2. Make sure Node.js 18+ is installed
 3. Try deleting `node_modules` and running `npm install` again
+
+### Activity not showing in Discord
+
+1. Make sure **Activities** is enabled in Discord Developer Portal
+2. Check that **Supported Platforms** includes your platform (Web, iOS, Android)
+3. Verify the **URL Mapping** points to your current tunnel URL
+4. Make sure you're in a **voice channel** (Activities only appear in voice channels)
+5. Your app must be added to the server (check Installation settings in Developer Portal)
 
 ## Resources
 
