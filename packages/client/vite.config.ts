@@ -6,9 +6,10 @@ export default defineConfig({
 
   server: {
     port: 3000,
+    strictPort: true, // fail if 3000 is in use instead of moving to 3001 (reserved for API server)
 
     // Allow Cloudflare tunnel and other external hosts
-    allowedHosts: ['.trycloudflare.com'],
+    allowedHosts: ['.trycloudflare.com', '.discordsays.com', '.cloudflare.net'],
 
     // Proxy API requests to the backend server
     proxy: {

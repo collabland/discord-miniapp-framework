@@ -53,12 +53,28 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS configuration
+// CORS configuration - allow tunnel origins when app is loaded inside Discord iframe
+const allowedOrigins = config.isProduction
+  ? undefined
+  : [
+      `http://localhost:${config.clientPort}`,
+      /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/,
+      /^https:\/\/[a-z0-9.-]+\.discordsays\.com$/,
+      /^https:\/\/[a-z0-9-]+\.cloudflare\.net$/,
+    ];
 app.use(
   cors({
-    origin: config.isProduction
-      ? undefined // In production, served from same origin
-      : `http://localhost:${config.clientPort}`,
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (Array.isArray(allowedOrigins)) {
+        const ok =
+          allowedOrigins.some((o) =>
+            typeof o === 'string' ? o === origin : o.test(origin)
+          );
+        return cb(null, ok ? origin : false);
+      }
+      cb(null, true);
+    },
     credentials: true,
   })
 );

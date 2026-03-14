@@ -397,8 +397,17 @@ async function main(): Promise<void> {
     debugLog('Guild ID:', discordSdk.guildId);
     debugLog('Channel ID:', discordSdk.channelId);
 
-  } catch (error) {
-    debugLog('ERROR in main:', error instanceof Error ? error.message : String(error));
+  } catch (error: unknown) {
+    const errMsg =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null && 'message' in error
+          ? String((error as { message?: unknown }).message)
+          : typeof error === 'object' && error !== null
+            ? JSON.stringify(error)
+            : String(error);
+    debugLog('ERROR in main:', errMsg);
+    debugLog('ERROR raw:', error);
     console.error('Failed to initialize Discord Mini App:', error);
 
     // Hide loading, show error
@@ -407,9 +416,7 @@ async function main(): Promise<void> {
 
     const errorMessage = document.getElementById('error-message');
     if (errorMessage) {
-      errorMessage.textContent = error instanceof Error
-        ? error.message
-        : 'Failed to connect to Discord. Please try again.';
+      errorMessage.textContent = errMsg || 'Failed to connect to Discord. Please try again.';
     }
   }
 }

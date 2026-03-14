@@ -71,7 +71,7 @@ npm run tunnel
 2. Click **"New Application"** and give it a name
 3. In **General Information**, copy your **Client ID**
 4. Go to **OAuth2** and click **"Reset Secret"** to get your **Client Secret**
-5. Add `http://localhost:3000` to **Redirects**
+5. Add to **Redirects**: `http://localhost:3000` and your **tunnel URL** (e.g. `https://your-subdomain.trycloudflare.com` or `https://your-app-id.discordsays.com`). The tunnel URL must be in Redirects or authorization will fail when the app loads inside Discord.
 6. Go to **Activities** and enable the **Activities** toggle
 7. Under **Supported Platforms**, enable: Web, iOS, Android
 8. Under **URL Mappings**, add your tunnel URL (from `npm run tunnel`)
@@ -226,11 +226,13 @@ This is a known issue with Discord Stable on Mac. **Solutions:**
 
 4. **Test on iOS/Android**: The mobile apps work reliably
 
-### "Failed to connect to Discord"
+### "Failed to connect to Discord" or "Connection Error" (fails at authorization)
 
 1. Make sure your `.env` file has the correct `VITE_CLIENT_ID` and `CLIENT_SECRET`
-2. Verify your Discord Application has Activities enabled
-3. Check that your tunnel URL is set in **URL Mappings** in Discord Developer Portal
+2. Verify your Discord Application has **Activities** enabled
+3. Check that your tunnel URL is set in **URL Mappings** (Activities tab)
+4. **Add your tunnel URL to OAuth2 Redirects**: Discord Developer Portal → your app → **OAuth2** → **Redirects** → add the exact URL your Activity loads from (e.g. `https://1482402817955201114.discordsays.com` or your `https://xxx.trycloudflare.com` URL). If this is missing, the authorize step fails and you see a connection error.
+5. The framework allows tunnel origins in CORS and Vite `allowedHosts` (e.g. `*.trycloudflare.com`, `*.discordsays.com`); no code change needed if you're on a recent version.
 
 ### "Tunnel not working"
 
@@ -239,11 +241,17 @@ This is a known issue with Discord Stable on Mac. **Solutions:**
 3. Try restarting the tunnel
 4. Note: Tunnel URLs change each time you restart - update your URL Mapping in Discord Developer Portal
 
-### "npm run dev fails"
+### "npm run dev fails" or "EADDRINUSE: address already in use :::3000 / 3001"
 
-1. Run `npm run check-env` to validate your configuration
-2. Make sure Node.js 18+ is installed
-3. Try deleting `node_modules` and running `npm install` again
+1. **Port in use**: Another process is using 3000 or 3001. Free the ports then start again:
+   ```bash
+   kill $(lsof -t -i :3000 -i :3001) 2>/dev/null
+   npm run dev
+   ```
+   Or find PIDs with `lsof -i :3000 -i :3001` and `kill <PID>`. The client uses 3000 and the API server uses 3001; Vite is set to `strictPort: true` so it won't grab 3001 if 3000 is taken.
+2. Run `npm run check-env` to validate your configuration
+3. Make sure Node.js 18+ is installed
+4. Try deleting `node_modules` and running `npm install` again
 
 ### Activity not showing in Discord
 
